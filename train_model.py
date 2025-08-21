@@ -21,9 +21,7 @@ X_train, X_test, y_train, y_test = train_test_split(X_vec, y, test_size=0.2, ran
 # 5. Train model
 model = LogisticRegression()
 model.fit(X_train, y_train)
-
 # 6. Save model + vectorizer
 joblib.dump(model, "model.pkl")
 joblib.dump(vectorizer, "vectorizer.pkl")
-
 print("✅ Training complete! Model and vectorizer saved.")
