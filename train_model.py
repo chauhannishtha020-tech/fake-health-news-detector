@@ -27,4 +27,3 @@ joblib.dump(model, "model.pkl")
 joblib.dump(vectorizer, "vectorizer.pkl")
 
 print("✅ Training complete! Model and vectorizer saved.")
-python train_model.py
