@@ -1,19 +1,47 @@
 import streamlit as st
-import random
-# Fake Health News Detector - Simple Prototype
+import joblib
+import numpy as np
+import matplotlib.pyplot as plt
 
-st.title("🩺 Fake Health News Detector")
+# Load model and vectorizer
+model = joblib.load("model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
 
-st.write("Enter a health news headline or statement below, and the model will predict if it's likely **real or fake**.")
+st.title("📰 Fake Health News Detector")
+st.write("Enter a news headline or article text to check if it's **Real or Fake**.")
 
 # User input
-headline = st.text_area("Enter Health News:")
+user_input = st.text_area("Paste your news text here:")
 
-if st.button("Check"):
-    if headline.strip() == "":
-        st.warning("Please enter some text first.")
+if st.button("Check News"):
+    if user_input.strip() != "":
+        # Preprocess and predict
+        X = vectorizer.transform([user_input])
+        prediction = model.predict(X)[0]
+        proba = model.predict_proba(X)[0]
+
+        # Show result
+        if prediction == 1:
+            st.success("✅ This news seems **REAL**.")
+        else:
+            st.error("❌ This news seems **FAKE**.")
+
+        # Show probabilities
+        st.subheader("Prediction Confidence")
+        st.write(f"Real: {proba[1]*100:.2f}%")
+        st.write(f"Fake: {proba[0]*100:.2f}%")
+
+        # Pie chart
+        fig, ax = plt.subplots()
+        labels = ["Fake", "Real"]
+        ax.pie(proba, labels=labels, autopct="%1.1f%%", startangle=90,
+               colors=["red", "green"], explode=(0.05, 0.05))
+        ax.axis("equal")
+        st.pyplot(fig)
+
+        # Google search link
+        st.subheader("🔎 Fact-check this news")
+        search_url = f"https://www.google.com/search?q={user_input}"
+        st.markdown(f"[Search this news on Google]({search_url})")
     else:
-        # Dummy prediction (for prototype)
-        result = random.choice(["✅ Real News", "❌ Fake News"])
-        st.success(f"Prediction: {result}")
-      
+        st.warning("⚠️ Please enter some news text first.")
