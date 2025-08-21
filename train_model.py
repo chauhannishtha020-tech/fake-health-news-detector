@@ -1,22 +1,29 @@
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
 import joblib
-# 1. Load dataset
-data = pd.read_csv("health_news.csv")
-# 2. Split features and labels
-X = data["text"]
-y = data["label"]
-# 3. Convert text to numbers
-vectorizer = TfidfVectorizer(stop_words="english")
-X_vec = vectorizer.fit_transform(X)
-# 4. Split into train and test
-X_train, X_test, y_train, y_test = train_test_split(X_vec, y, test_size=0.2, random_state=42)
-# 5. Train model
+
+# Load dataset
+df = pd.read_csv("health_news.csv")   # make sure this CSV is in same folder
+
+# Split data
+X = df["text"]
+y = df["label"]
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Vectorize
+vectorizer = TfidfVectorizer(max_features=5000)
+X_train_vec = vectorizer.fit_transform(X_train)
+X_test_vec = vectorizer.transform(X_test)
+
+# Train model
 model = LogisticRegression()
-model.fit(X_train, y_train)
-# 6. Save model + vectorizer
+model.fit(X_train_vec, y_train)
+
+# Save model & vectorizer
 joblib.dump(model, "model.pkl")
 joblib.dump(vectorizer, "vectorizer.pkl")
-print("✅ Training complete! Model and vectorizer saved.")
+
+print("✅ Model and Vectorizer saved successfully!")
